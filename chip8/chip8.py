@@ -56,11 +56,27 @@ class Chip8:
             self.memory[i] = val
 
     def start(self):
-        # self.load_rom(self.rom_path)
         self.screen.start()
+        self.run()
+        self.shutdown()
+
+    def run(self):
         self.running = True
 
         while self.running:
+
+            self.handle_events()
+
+            # get current opcode
+            opcode = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
+
+            # execute opcode
+            # self.screen.refresh()
+
+            # slow down emulation for timers
+            # to work correctly
+            # execute 60 opcodes in one second
+            pygame.time.delay(round((1/1024)*1000))
             
             self.listen()
 
