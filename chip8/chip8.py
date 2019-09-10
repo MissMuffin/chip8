@@ -542,9 +542,9 @@ class Chip8:
 
 def main():
     emu = Chip8()
-    
+
     emu.rom_path = "BC_test.ch8"
-    i = 0x200
+    i = 512
     with open(emu.rom_path, "rb") as f:
         byte = f.read(1)
         while byte:
@@ -552,8 +552,8 @@ def main():
             i += 1
             byte = f.read(1)
 
-
     emu.start()
+
 
 if __name__ == "__main__":
     main()
