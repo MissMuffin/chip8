@@ -25,7 +25,7 @@ class Screen:
         self.white = (255, 255, 255)
         self.black = (0, 0, 0)
 
-        self.pixels = []
+        self.pixels = None
         self.clear()
 
         pygame.init()
@@ -56,6 +56,7 @@ class Screen:
         self.refresh()
 
     def clear(self):
+        # pixels[x][y]
         self.pixels = [[0]*self.y_size for i in range(self.x_size)]
 
     def initCommands(self):
