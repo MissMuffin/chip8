@@ -34,7 +34,7 @@ class Chip8:
 
         # registers
         self.v = [0] * 16
-        self.i = [0] * 16
+        self.i = 0
 
         # we have 16 keys as input
         # 1|2|3|C
