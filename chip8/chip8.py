@@ -11,6 +11,8 @@ class Chip8:
 
     def __init__(self):
 
+        self.counter = 0
+
         self.rom_path = None
         self.running = False
         self.screen = Screen()
@@ -49,6 +51,8 @@ class Chip8:
         # which will translate into an array index
         self.keys = [False] * 16
 
+        self.draw_flag = True
+
         # self.screen.clear() # TODO does this work here?
 
     def load_font(self):
@@ -73,25 +77,44 @@ class Chip8:
             opcode = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
 
             # execute opcode
-            # self.screen.refresh()
+            self.execute_opcode(opcode)
+            self.counter += 1
+            oc = hex(opcode)
 
-            # slow down emulation for timers
-            # to work correctly
-            # execute 60 opcodes in one second
-            pygame.time.delay(round((1/1024)*1000))
+            # do draw/timer update 60 times pers second
+            # we do 1024 isntruction per second
+            # 1024/60 = draw/timer update every 17 instructions
+            if self.counter == 17:
+                if self.draw_flag:
+                    self.screen.refresh()
+                    # print(f"{self.counter}: draw flag in run")
+                    self.draw_flag = False
+
+                # update timers
+                if self.delay_timer > 0:
+                    self.delay_timer -= 1
+                
+                if self.sound_timer > 0:
+                    # if sound_timer == 1:
+                    print("BEEP!")
+                    self.sound_timer -= 1
+                self.counter = 0
+
+            # slow down emulation to 1024 instructions per second
+            time.sleep(round(1/1024))
 
     def execute_opcode(self, opcode):
         ident = opcode & 0xF000
 
-        if ident is 0x0000:
+        if ident == 0x0000:
             param = opcode & 0x000F
 
-            if param is 0x0000:
+            if param == 0x0000:
                 # display clear
                 self.screen.clear()
                 self.pc += 2
 
-            elif param is 0x000E:
+            elif param == 0x000E:
                 # return from subroutine
                 if self.sp > 0:
                     self.sp -= 1
@@ -102,19 +125,19 @@ class Chip8:
                 # opcode is 0NNN, not necessary for most roms
                 pass
 
-        elif ident is 0x1000:
+        elif ident == 0x1000:
             # jump to address NNN
             addr = opcode & 0x0FFF
             self.pc = addr
 
-        elif ident is 0x2000:
+        elif ident == 0x2000:
             # calls subroutine at address NNN
             self.stack[self.sp] = self.pc
             self.sp += 1 # TODO handle overflow?
             addr = opcode & 0x0FFF
             self.pc = addr
 
-        elif ident is 0x3000:
+        elif ident == 0x3000:
             # skips next instr if V[X] == NN
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
@@ -122,7 +145,7 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
-        elif ident is 0x4000:
+        elif ident == 0x4000:
             # skips next instr if VX != NN
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
@@ -130,7 +153,7 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
-        elif ident is 0x5000:
+        elif ident == 0x5000:
             # skips next instr if VX == VY
             x = (opcode & 0x0F00) >> 8
             y = (opcode & 0x00F0) >> 4
@@ -138,52 +161,52 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
-        elif ident is 0x6000:
+        elif ident == 0x6000:
             # sets VX to NN
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
             self.v[x] = nn
             self.pc += 2
 
-        elif ident is 0x7000:
+        elif ident == 0x7000:
             # adds NN to VX (carry flag not changed)
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
             self.v[x] += nn
             self.pc += 2
 
-        elif ident is 0x8000:
+        elif ident == 0x8000:
             param = opcode & 0x000F
 
-            if param is 0x0000:
+            if param == 0x0000:
                 # Sets VX to the value of VY
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = self.v[y]
                 self.pc += 2
 
-            elif param is 0x0001:
+            elif param == 0x0001:
                 # Sets VX to VX or VY. (Bitwise OR operation)
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = self.v[x] | self.v[y]
                 self.pc += 2
 
-            elif param is 0x0002:
+            elif param == 0x0002:
                 # Sets VX to VX and VY. (Bitwise AND operation)
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = self.v[x] & self.v[y]
                 self.pc += 2
 
-            elif param is 0x0003:
+            elif param == 0x0003:
                 # Sets VX to VX xor VY.
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = self.v[x] ^ self.v[y]
                 self.pc += 2
 
-            elif param is 0x0004:
+            elif param == 0x0004:
                 # Adds VY to VX. VF is set to 1 when there's a
                 # carry, and to 0 when there isn't.
                 x = (opcode & 0x0F00) >> 8
@@ -197,13 +220,14 @@ class Chip8:
                 self.v[x] = (vx + vy) % 0xFF
                 self.pc += 2
 
-            elif param is 0x0005:
+            elif param == 0x0005:
                 # VY is subtracted from VX. VF is set to 0 when
                 # there's a borrow, and 1 when there isn't
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 vx = self.v[x]
                 vy = self.v[y]
+
                 if vy > vx:
                     self.v[0xF] = 0
                 else:
@@ -211,7 +235,7 @@ class Chip8:
                 self.v[x] = (vx - vy) % 0xFF # TODO is correct?
                 self.pc += 2
 
-            elif param is 0x0006:
+            elif param == 0x0006:
                 # Stores the least significant bit of VX in VF
                 # and then shifts VX to the right by 1.
                 x = (opcode & 0x0F00) >> 8
@@ -220,13 +244,14 @@ class Chip8:
                 self.v[x] = vx >> 1
                 self.pc += 2
 
-            elif param is 0x0007:
+            elif param == 0x0007:
                 # Sets VX to VY minus VX. VF is set to 0 when
                 # there's a borrow, and 1 when there isn't.
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 vx = self.v[x]
                 vy = self.v[y]
+                
                 if vx > vy:
                     self.v[0xF] = 0
                 else:
@@ -234,7 +259,7 @@ class Chip8:
                 self.v[x] = (vx - vy) % 0xFF # TODO is correct?
                 self.pc += 2
 
-            elif param is 0x000E:
+            elif param == 0x000E:
                 # Stores the most significant bit of VX in VF
                 # and then shifts VX to the left by 1
                 x = (opcode & 0x0F00) >> 8
@@ -243,7 +268,7 @@ class Chip8:
                 self.v[x] = vx << 1
                 self.pc += 2
 
-        elif ident is 0x9000:
+        elif ident == 0x9000:
             # skips next instr if VX != VY
             x = (opcode & 0x0F00) >> 8
             y = (opcode & 0x00F0) >> 4
@@ -251,7 +276,7 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
-        elif ident is 0xA000:
+        elif ident == 0xA000:
             # Sets I to the address NNN
             nnn = opcode & 0x0FFF
             self.i = nnn
@@ -311,10 +336,10 @@ class Chip8:
                         self.screen.pixels[x + idx][y + row] = old_pixel ^ 1
             self.pc += 2
 
-        elif ident is 0xE000:
+        elif ident == 0xE000:
             param = opcode & 0x000F
 
-            if param is 0x000E:
+            if param == 0x000E:
                 # Skips the next instruction if the key stored in VX is pressed
                 x = opcode & 0x0F00 >> 8
                 vx = self.v[x]
@@ -322,7 +347,7 @@ class Chip8:
                     self.pc += 2
                 self.pc += 2
 
-            elif param is 0x0001:
+            elif param == 0x0001:
                 # Skips the next instruction if the key stored in VX isn't pressed
                 x = opcode & 0x0F00 >> 8
                 vx = self.v[x]
@@ -330,7 +355,7 @@ class Chip8:
                     self.pc += 2
                 self.pc += 2
 
-        elif ident is 0xF000:
+        elif ident == 0xF000:
             param = opcode & 0x000F
 
             if param is 0x0007:
@@ -339,7 +364,7 @@ class Chip8:
                 self.v[x] = self.delay_timer
                 self.pc += 2
 
-            elif param is 0x000A:
+            elif param == 0x000A:
                 # A key press is awaited, and then stored in VX. (Blocking
                 # Operation. All instruction halted until next key event)
                 if 1 in self.keys:  
@@ -353,7 +378,7 @@ class Chip8:
                     # repeat opcode until key has been pressed
                     self.pc -= 2
 
-            elif param is 0x0005:
+            elif param == 0x0005:
                 param = opcode & 0x00F0
 
                 if param is 0x0010:
@@ -363,7 +388,7 @@ class Chip8:
                     self.delay_timer = vx
                     self.pc += 2
 
-                elif param is 0x0050:
+                elif param == 0x0050:
                     # Stores V0 to VX (including VX) in memory starting at
                     # address I. The offset from I is increased by 1 for each
                     # value written
@@ -374,7 +399,7 @@ class Chip8:
                     self.i = (self.i + x + 1) % 0xFFFF
                     self.pc += 2
 
-                elif param is 0x0060:
+                elif param == 0x0060:
                     # Fills V0 to VX (including VX) with values from memory
                     # starting at address I. The offset from I is increased
                     # by 1 for each value written
@@ -385,21 +410,21 @@ class Chip8:
                     self.i = (self.i + x + 1) % 0xFFFF
                     self.pc += 2
 
-            elif param is 0x0008:
+            elif param == 0x0008:
                 # Sets the sound timer to VX.
                 x = opcode & 0x0F00 >> 8
                 vx = self.v[x]
                 self.sound_timer = vx
                 self.pc += 2
 
-            elif param is 0x000E:
+            elif param == 0x000E:
                 # Adds VX to I
                 x = opcode & 0x0F00 >> 8
                 vx = self.v[x]
                 self.i = (self.i + vx) % 0xFFFF # TODO mod for overflow necessary?
                 self.pc += 2
 
-            elif param is 0x0009:
+            elif param == 0x0009:
                 # Sets I to the location of the sprite for the character in VX.
                 # Characters 0-F (in hexadecimal) are represented by a 4x5 font.
                 x = opcode & 0x0F00 >> 8
@@ -407,7 +432,7 @@ class Chip8:
                 self.i = vx * 5  # times 5 because each char is 5 long
                 self.pc += 2
 
-            elif param is 0x0003:
+            elif param == 0x0003:
                 # Stores the binary-coded decimal representation of VX, with the
                 # most significant of three digits at the address in I, the middle
                 # digit at I plus 1, and the least significant digit at I plus 2.
