@@ -317,12 +317,8 @@ class Chip8:
             y = (opcode & 0x00F0) >> 4
             n_rows = opcode & 0x000F
 
-            # check if sprite is inside width and height
-            if x + 8 > 0x3F or y + n_rows > 0x1F:
-                self.pc += 2
-                # TODO handle out of bounds?
-                print("DXYN: out of bounds sprite coords")
-                return
+            x_coord = self.v[x]
+            y_coord = self.v[y]
 
             # set to no collision initially
             self.v[0xF] = 0
@@ -330,16 +326,28 @@ class Chip8:
             # draw 8 bits x n bits big sprite
             for row in range(n_rows):
                 sprite_row = self.memory[self.i + row]
+                if (y_coord + row) > 31:
+                    self.pc += 2
+                    return
+
                 for idx in range(8):
+
+                    if (x_coord + idx) > 63:
+                        self.pc += 2
+                        return
                     # check each bit in the sprite row
                     # start with MSB (left)
                     mask = 0x8 >> idx
                     if sprite_row & mask not 0:
                         # check for collision
-                        old_pixel = self.screen.pixels[x + idx][y + row]
+                        old_pixel = self.screen.pixels[x_coord + idx][y_coord + row]
                         if old_pixel == 1:
                             self.v[0xF] = 1
-                        self.screen.pixels[x + idx][y + row] = old_pixel ^ 1
+
+                        self.screen.pixels[x_coord + idx][y_coord + row] = 1 ^ old_pixel
+            # print(f"opcode: {opcode} I: {self.i} size: 8x{n_rows} x: {x} y: {y}")
+                
+            self.draw_flag = True
             self.pc += 2
 
         elif ident == 0xE000:
