@@ -293,7 +293,7 @@ class Chip8:
         elif ident == 0xC000:
             # Sets VX to the result of a bitwise and operation on
             # a random number (Typically: 0 to 255) and NN
-            x = opcode & 0x0F00 >> 8
+            x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
             self.v[x] = (randint(0, 255) & nn) & 0x00FF
             self.pc += 2
@@ -309,8 +309,8 @@ class Chip8:
             # is outside the coordinates of the display, it wraps around to the opposite side of 
             # the screen. 
 
-            x = opcode & 0x0F00 >> 8
-            y = opcode & 0x00F0 >> 4
+            x = (opcode & 0x0F00) >> 8
+            y = (opcode & 0x00F0) >> 4
             n_rows = opcode & 0x000F
 
             # check if sprite is inside width and height
@@ -343,7 +343,7 @@ class Chip8:
 
             if param == 0x000E:
                 # Skips the next instruction if the key stored in VX is pressed
-                x = opcode & 0x0F00 >> 8
+                x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 if self.keys[vx]:
                     self.pc += 2
@@ -351,8 +351,9 @@ class Chip8:
 
             elif param == 0x0001:
                 # Skips the next instruction if the key stored in VX isn't pressed
-                x = opcode & 0x0F00 >> 8
+                x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
+                
                 if not self.keys[vx]:
                     self.pc += 2
                 self.pc += 2
@@ -373,8 +374,8 @@ class Chip8:
                     # TODO according to https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
                     # this is wrong behavior?
                     idx = self.keys.index(1)
-                    x = opcode & 0x0F00 >> 8
-                    self.v[x] = idx
+                    x = (opcode & 0x0F00) >> 8
+                    self.v[x] = idx & 0x00FF
                     self.pc += 2
                 else:
                     # repeat opcode until key has been pressed
@@ -383,9 +384,9 @@ class Chip8:
             elif param == 0x0005:
                 param = opcode & 0x00F0
 
-                if param is 0x0010:
+                if param == 0x0010:
                     # sets the delay timer to VX
-                    x = opcode & 0x0F00 >> 8
+                    x = (opcode & 0x0F00) >> 8
                     vx = self.v[x]
                     self.delay_timer = vx
                     self.pc += 2
@@ -395,7 +396,7 @@ class Chip8:
                     # address I. The offset from I is increased by 1 for each
                     # value written
                     # I is set to I + X + 1 after operation
-                    x = opcode & 0x0F00 >> 8
+                    x = (opcode & 0x0F00) >> 8
                     for idx in range(x + 1): # +1 for inclusive
                         self.memory[self.i + idx] = self.v[idx] & 0x00FF
                     self.i = (self.i + x + 1) & 0x000FFFF # TODO is this correct or not? cowgood vs mattmik
@@ -406,7 +407,7 @@ class Chip8:
                     # starting at address I. The offset from I is increased
                     # by 1 for each value written
                     # I is set to I + X + 1 after operation
-                    x = opcode & 0x0F00 >> 8
+                    x = (opcode & 0x0F00) >> 8
                     for idx in range(x + 1): # +1 for inclusive
                         self.v[idx] = (self.memory[self.i + idx]) & 0x000FF
                     self.i = (self.i + x + 1) & 0x000FFFF # TODO is this correct or not? cowgood vs mattmik
@@ -414,14 +415,14 @@ class Chip8:
 
             elif param == 0x0008:
                 # Sets the sound timer to VX.
-                x = opcode & 0x0F00 >> 8
+                x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.sound_timer = vx
                 self.pc += 2
 
             elif param == 0x000E:
                 # Adds VX to I
-                x = opcode & 0x0F00 >> 8
+                x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.i = (self.i + vx) & 0x00FFFF # TODO is modulo here correct or not? test rom only passes without modulo. why??
                 self.pc += 2
@@ -429,7 +430,7 @@ class Chip8:
             elif param == 0x0009:
                 # Sets I to the location of the sprite for the character in VX.
                 # Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-                x = opcode & 0x0F00 >> 8
+                x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.i = (vx * 5) & 0x000FFFF  # times 5 because each char is 5 long
                 self.pc += 2
@@ -441,7 +442,7 @@ class Chip8:
                 # (In other words, take the decimal representation of VX, place
                 # the hundreds digit in memory at location in I, the tens digit
                 # at location I+1, and the ones digit at location I+2.)
-                x = opcode & 0x0F00 >> 8
+                x = (opcode & 0x0F00) >> 8
                 # vx is 3 digit decimal number
                 vx = self.v[x]
                 # get hundreds
