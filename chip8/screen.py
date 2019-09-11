@@ -108,11 +108,11 @@ class Screen:
                         self.upscaling
                     )
                 )
-        pygame.display.flip()   # updates full display
+        # update full display
+        pygame.display.flip()
 
     def destroy(self):
         pygame.quit()
-
 
 def main():
     x = Screen()
