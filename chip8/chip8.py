@@ -523,7 +523,6 @@ class Chip8:
                 if event.key == K_ESCAPE:
                     self.running = False
                 elif event.key == K_F1:
-                    print("event change rom")
                     # change rom
                     self.change_rom()
                     pass
@@ -532,7 +531,6 @@ class Chip8:
                     self.reboot()
                     pass
                 elif event.key == K_F3:
-                    print("event pause")
                     # pause/unpause
                     self.paused = not self.paused
                     pass
