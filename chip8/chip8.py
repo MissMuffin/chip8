@@ -527,75 +527,75 @@ class Chip8:
 
                 if event.key == K_1:
                     self.keys[0x1] = True
-                if event.key == K_2:
+                elif event.key == K_2:
                     self.keys[0x2] = True
-                if event.key == K_3:
+                elif event.key == K_3:
                     self.keys[0x3] = True
-                if event.key == K_4:
+                elif event.key == K_4:
                     self.keys[0xC] = True
 
-                if event.key == K_q:
+                elif event.key == K_q:
                     self.keys[0x4] = True
-                if event.key == K_w:
+                elif event.key == K_w:
                     self.keys[0x5] = True
-                if event.key == K_e:
+                elif event.key == K_e:
                     self.keys[0x6] = True
-                if event.key == K_r:
+                elif event.key == K_r:
                     self.keys[0xD] = True
 
-                if event.key == K_a:
+                elif event.key == K_a:
                     self.keys[0x7] = True
-                if event.key == K_s:
+                elif event.key == K_s:
                     self.keys[0x8] = True
-                if event.key == K_d:
+                elif event.key == K_d:
                     self.keys[0x9] = True
-                if event.key == K_f:
+                elif event.key == K_f:
                     self.keys[0xE] = True
 
-                if event.key == K_z:
+                elif event.key == K_z:
                     self.keys[0xA] = True
-                if event.key == K_x:
+                elif event.key == K_x:
                     self.keys[0x0] = True
-                if event.key == K_c:
+                elif event.key == K_c:
                     self.keys[0xB] = True
-                if event.key == K_v:
+                elif event.key == K_v:
                     self.keys[0xF] = True
             elif event.type == KEYUP:
 
                 if event.key == K_1:
                     self.keys[0x1] = False
-                if event.key == K_2:
+                elif event.key == K_2:
                     self.keys[0x2] = False
-                if event.key == K_3:
+                elif event.key == K_3:
                     self.keys[0x3] = False
-                if event.key == K_4:
+                elif event.key == K_4:
                     self.keys[0xC] = False
 
-                if event.key == K_q:
+                elif event.key == K_q:
                     self.keys[0x4] = False
-                if event.key == K_w:
+                elif event.key == K_w:
                     self.keys[0x5] = False
-                if event.key == K_e:
+                elif event.key == K_e:
                     self.keys[0x6] = False
-                if event.key == K_r:
+                elif event.key == K_r:
                     self.keys[0xD] = False
 
-                if event.key == K_a:
+                elif event.key == K_a:
                     self.keys[0x7] = False
-                if event.key == K_s:
+                elif event.key == K_s:
                     self.keys[0x8] = False
-                if event.key == K_d:
+                elif event.key == K_d:
                     self.keys[0x9] = False
-                if event.key == K_f:
+                elif event.key == K_f:
                     self.keys[0xE] = False
 
-                if event.key == K_z:
+                elif event.key == K_z:
                     self.keys[0xA] = False
-                if event.key == K_x:
+                elif event.key == K_x:
                     self.keys[0x0] = False
-                if event.key == K_c:
+                elif event.key == K_c:
                     self.keys[0xB] = False
-                if event.key == K_v:
+                elif event.key == K_v:
                     self.keys[0xF] = False
 
 def main():
