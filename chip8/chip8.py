@@ -5,6 +5,8 @@ import pygame
 from pygame.locals import *
 from utils import Utils
 from random import randint
+import pdb
+import time
 
 
 class Chip8:
