@@ -559,6 +559,8 @@ class Chip8:
                     pass
                 elif event.key == K_F4:
                     # dump screen to file
+                    fname = self.screen.dump()
+                    print(f"dumped screen to {fname}")
                     pass
                 elif event.key == K_F5:
                     # dump memory and registers to file

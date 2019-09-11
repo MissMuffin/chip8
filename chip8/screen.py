@@ -1,6 +1,7 @@
 import tkinter
 import pygame
 from pygame.locals import *
+import csv
 
 
 class Screen:
@@ -54,6 +55,18 @@ class Screen:
 
         self.memY = self.initCommands()
         self.refresh()
+
+    def dump(self):
+
+        fname = "dump_screen.csv"        
+        transposed = list(zip(*self.pixels))
+
+        with open(fname, 'w') as f:
+            writer = csv.writer(f, delimiter=' ')
+            writer.writerows(transposed)
+
+        return fname
+
 
     def clear(self):
         # pixels[x][y]
