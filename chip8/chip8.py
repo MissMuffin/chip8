@@ -22,6 +22,7 @@ class Chip8:
     def init_system(self):
 
         self.counter = 0
+        self.paused = False
         
         self.memory = [0] * 4096
         self.stack = [0] * 16
@@ -75,6 +76,9 @@ class Chip8:
         while self.running:
 
             self.handle_events()
+
+            while self.paused:
+                self.handle_events()
 
             # get current opcode
             opcode = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
@@ -530,6 +534,7 @@ class Chip8:
                 elif event.key == K_F3:
                     print("event pause")
                     # pause/unpause
+                    self.paused = not self.paused
                     pass
 
                 if event.key == K_1:
@@ -608,8 +613,8 @@ class Chip8:
 def main():
     emu = Chip8()
 
-    emu.rom_path = "BC_test.ch8"
-    # emu.rom_path = "roms/Space Invaders [David Winter].ch8"
+    # emu.rom_path = "BC_test.ch8"
+    emu.rom_path = "roms/Space Invaders [David Winter].ch8"
     # emu.rom_path = "roms/Brix [Andreas Gustafsson, 1990].ch8"
 
     emu.load_rom()
