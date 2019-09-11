@@ -351,7 +351,7 @@ class Chip8:
                         if old_pixel == 1:
                             self.v[0xF] = 1
 
-                        self.screen.pixels[x_coord + idx][y_coord + row] = 1 ^ old_pixel
+                        self.screen.pixels[x_coord + idx][y_coord + row] = old_pixel ^ 1
 
             # print(f"opcode: {opcode} I: {self.i} size: 8x{n_rows} x: {x} y: {y}")
                 
