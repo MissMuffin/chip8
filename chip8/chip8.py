@@ -13,17 +13,16 @@ class Chip8:
 
     def __init__(self):
 
-        self.counter = 0
-
         self.rom_path = None
         self.running = False
         self.screen = Screen()
-        self.init_system()
-        self.load_font()
         self.beep = pygame.mixer.Sound("beep.ogg")
+        self.init_system()
 
     def init_system(self):
 
+        self.counter = 0
+        
         self.memory = [0] * 4096
         self.stack = [0] * 16
 
@@ -53,6 +52,8 @@ class Chip8:
         # keys[0xf]
         # which will translate into an array index
         self.keys = [False] * 16
+
+        self.load_font()
 
         self.screen.clear()
         self.draw_flag = True
