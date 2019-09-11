@@ -284,13 +284,13 @@ class Chip8:
             self.i = nnn
             self.pc += 2
 
-        elif ident is 0xB000:
+        elif ident == 0xB000:
             # jumps to adress NNN plus V0
             nnn = opcode & 0x0FFF
             v0 = self.v[0]
             self.pc = (nnn + v0) & 0x000FFFF
 
-        elif ident is 0xC000:
+        elif ident == 0xC000:
             # Sets VX to the result of a bitwise and operation on
             # a random number (Typically: 0 to 255) and NN
             x = opcode & 0x0F00 >> 8
@@ -298,7 +298,7 @@ class Chip8:
             self.v[x] = (randint(0, 255) & nn) & 0x00FF
             self.pc += 2
 
-        elif ident is 0xD000:
+        elif ident == 0xD000:
             # Dxyn
             # Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 
