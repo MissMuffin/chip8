@@ -103,7 +103,7 @@ class Chip8:
                 self.counter = 0
 
             # slow down emulation to 1024 instructions per second
-            time.sleep(round(1/1024))
+            pygame.time.delay(round((1/1024)*1000))
 
     def execute_opcode(self, opcode):
         ident = opcode & 0xF000
