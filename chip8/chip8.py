@@ -77,7 +77,7 @@ class Chip8:
 
             self.handle_events()
 
-            while self.paused:
+            while self.paused and self.running:
                 self.handle_events()
 
             # get current opcode
