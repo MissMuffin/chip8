@@ -556,6 +556,7 @@ class Chip8:
                 elif event.key == K_F3:
                     # pause/unpause
                     self.paused = not self.paused
+                    self.screen.show_paused(self.paused)
                     pass
                 elif event.key == K_F4:
                     # dump screen to file

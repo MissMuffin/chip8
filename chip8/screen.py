@@ -40,7 +40,6 @@ class Screen:
         self.window = pygame.display.set_mode((self.window_size_x, self.window_size_y), RESIZABLE)
 
         self.show_menu()
-        self.refresh()
 
     def clear(self):
         # pixels[x][y]
@@ -58,6 +57,9 @@ class Screen:
         return fname
 
     def show_menu(self):
+
+        # erase entire pygame surface
+        pygame.display.get_surface().fill(pygame.Color("black"))
 
         x = 20
         y = self.y_size * self.upscaling + 20
@@ -84,6 +86,20 @@ class Screen:
         offset_x += 30
         offset_y += self.render_text("F4: Dump screen", offset_x, offset_y)[1]
         offset_x += self.render_text("F5: Dump memory & registers", offset_x, offset_y)[0]
+
+        self.refresh()
+
+    def show_paused(self, paused):
+
+        if paused:
+            text = "PAUSED"
+            size = self.font.size(text)
+            x = self.window_size_x - size[0]
+            y = self.window_size_y - size[1]
+            self.window.blit(self.font.render(text, True, self.white), (x, y))
+            self.refresh()
+        else:
+            self.show_menu()
 
 
     def render_text(self, text, x, y):
@@ -127,6 +143,9 @@ def main():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False
+                elif event.key == K_F3:
+                    # toggle pause
+                    x.show_paused()
             elif event.type == QUIT:
                 running = False
 
