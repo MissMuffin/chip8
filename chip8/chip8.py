@@ -502,6 +502,9 @@ class Chip8:
                 i += 1
                 byte = f.read(1)
 
+    def change_rom(self):
+        pass
+
     def handle_events(self):
         for event in pygame.event.get():
 
@@ -518,7 +521,6 @@ class Chip8:
                     pass
                 elif event.key == K_F2:
                     # reboot
-                    print("event rebooting")
                     self.reboot()
                     pass
                 elif event.key == K_F3:
@@ -606,18 +608,7 @@ def main():
     emu.rom_path = "roms/Space Invaders [David Winter].ch8"
     # emu.rom_path = "roms/Brix [Andreas Gustafsson, 1990].ch8"
 
-    # root = tkinter.Tk() 					# Creating a Tkinter window to use the file browser
-    # emu.rom_path = askopenfilename() 	# Displaying the file browser and getting the selecting file
-    # root.destroy() 					# Destroying Tkinter
-
-    i = 512
-    with open(emu.rom_path, "rb") as f:
-        byte = f.read(1)
-        while byte:
-            emu.memory[i] = int.from_bytes(byte, "big", signed=False)
-            i += 1
-            byte = f.read(1)
-
+    emu.load_rom()
     emu.start()
 
 
