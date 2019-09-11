@@ -1,3 +1,6 @@
+/roms
+*.ch8
+
 .vscode/*
 # !.vscode/settings.json
 # !.vscode/tasks.json
