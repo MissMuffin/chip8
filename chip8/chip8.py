@@ -54,9 +54,8 @@ class Chip8:
         # which will translate into an array index
         self.keys = [False] * 16
 
-        self.draw_flag = True
-
         self.screen.clear()
+        self.draw_flag = True
 
     def load_font(self):
         # load font set into memory
@@ -504,7 +503,9 @@ class Chip8:
                 byte = f.read(1)
 
     def change_rom(self):
-        pass
+        self.init_system()
+        self.rom_path = None
+        self.load_rom()
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -519,6 +520,7 @@ class Chip8:
                 elif event.key == K_F1:
                     print("event change rom")
                     # change rom
+                    self.change_rom()
                     pass
                 elif event.key == K_F2:
                     # reboot
@@ -605,8 +607,8 @@ class Chip8:
 def main():
     emu = Chip8()
 
-    # emu.rom_path = "BC_test.ch8"
-    emu.rom_path = "roms/Space Invaders [David Winter].ch8"
+    emu.rom_path = "BC_test.ch8"
+    # emu.rom_path = "roms/Space Invaders [David Winter].ch8"
     # emu.rom_path = "roms/Brix [Andreas Gustafsson, 1990].ch8"
 
     emu.load_rom()
