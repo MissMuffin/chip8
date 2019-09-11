@@ -112,6 +112,8 @@ class Chip8:
             if param == 0x0000:
                 # display clear
                 self.screen.clear()
+                # print("screen clear")
+                self.draw_flag = True
                 self.pc += 2
 
             elif param == 0x000E:
