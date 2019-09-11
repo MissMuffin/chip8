@@ -20,6 +20,7 @@ class Chip8:
         self.screen = Screen()
         self.init_system()
         self.load_font()
+        self.beep = pygame.mixer.Sound("beep.ogg")
 
     def init_system(self):
 
@@ -97,8 +98,8 @@ class Chip8:
                     self.delay_timer -= 1
                 
                 if self.sound_timer > 0:
-                    # if sound_timer == 1:
-                    print("BEEP!")
+                    if self.sound_timer == 1:
+                        self.beep.play()
                     self.sound_timer -= 1
                 self.counter = 0
 
