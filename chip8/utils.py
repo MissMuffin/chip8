@@ -28,4 +28,4 @@ class Utils:
     @staticmethod
     def get_MSB(val):
         # val max length is 8 bits
-        return (val >> 8) & 1
+        return (val >> 7) & 1
