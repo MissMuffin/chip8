@@ -65,6 +65,33 @@ class Chip8:
         for i, val in enumerate(Utils.get_font()):
             self.memory[i] = val
 
+    def dump(self):
+
+        fname = "dump_mem_reg.txt"
+        op = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
+        
+        with open(fname, "w") as f:
+            f.write(f"Instruction counter: {self.counter}\n")
+            f.write(f"Opcode: {op}\n")
+            f.write(f"I: {self.i}\n")
+            f.write(f"PC: {self.pc}\n")
+            f.write(f"SP: {self.sp}\n")
+            f.write(f"sound timer: {self.sound_timer}\n")
+            f.write(f"delay timer: {self.delay_timer}\n")
+
+            f.write(f"\n-----------------------------------------------------------\n\n")
+            for i, val in enumerate(self.stack):
+                f.write(f"stack[{i}] : {val}\n")
+
+            f.write(f"\n-----------------------------------------------------------\n\n")
+            for i, val in enumerate(self.v):
+                f.write(f"V[{i}] : {val}\n")
+
+            f.write(f"\n-----------------------------------------------------------\n\n")
+            for i, val in enumerate(self.memory):
+                f.write(f"{hex(i)} : {val}\n")
+        return fname
+
     def start(self):
         self.screen.start()
         self.run()
@@ -529,6 +556,14 @@ class Chip8:
                 elif event.key == K_F3:
                     # pause/unpause
                     self.paused = not self.paused
+                    pass
+                elif event.key == K_F4:
+                    # dump screen to file
+                    pass
+                elif event.key == K_F5:
+                    # dump memory and registers to file
+                    fname = self.dump()
+                    print(f"dumped memory and registers to {fname}")
                     pass
 
                 if event.key == K_1:
