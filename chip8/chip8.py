@@ -55,7 +55,7 @@ class Chip8:
 
         self.draw_flag = True
 
-        # self.screen.clear() # TODO does this work here?
+        self.screen.clear()
 
     def load_font(self):
         # load font set into memory
@@ -511,6 +511,19 @@ class Chip8:
 
                 if event.key == K_ESCAPE:
                     self.running = False
+                elif event.key == K_F1:
+                    print("event change rom")
+                    # change rom
+                    pass
+                elif event.key == K_F2:
+                    # reboot
+                    print("event rebooting")
+                    self.reboot()
+                    pass
+                elif event.key == K_F3:
+                    print("event pause")
+                    # pause/unpause
+                    pass
 
                 if event.key == K_1:
                     self.keys[0x1] = True
