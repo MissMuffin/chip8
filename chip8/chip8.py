@@ -307,8 +307,8 @@ class Chip8:
             self.v[x] = (randint(0, 255) & nn) & 0x00FF
             self.pc += 2
 
+        # DXYN
         elif ident == 0xD000:
-            # Dxyn
             # Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
 
             # The interpreter reads n bytes from memory, starting at the address stored in I. 
@@ -332,15 +332,13 @@ class Chip8:
             for row in range(n_rows):
                 sprite_row = self.memory[self.i + row]
 
-                if (y_coord + row) > 31:
-                    self.pc += 2
-                    return
+                if (y_coord + row) >= 32:
+                    continue
 
                 for idx in range(8):
 
-                    if (x_coord + idx) > 63:
-                        self.pc += 2
-                        return
+                    if (x_coord + idx) >= 64:
+                        continue
 
                     # check each bit in the sprite row
                     # start with MSB (left)
