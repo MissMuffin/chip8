@@ -326,6 +326,7 @@ class Chip8:
             # draw 8 bits x n bits big sprite
             for row in range(n_rows):
                 sprite_row = self.memory[self.i + row]
+
                 if (y_coord + row) > 31:
                     self.pc += 2
                     return
@@ -335,16 +336,20 @@ class Chip8:
                     if (x_coord + idx) > 63:
                         self.pc += 2
                         return
+
                     # check each bit in the sprite row
                     # start with MSB (left)
-                    mask = 0x8 >> idx
-                    if sprite_row & mask not 0:
+                    mask = 0x80 >> idx
+                    if (sprite_row & mask) != 0:
+
                         # check for collision
                         old_pixel = self.screen.pixels[x_coord + idx][y_coord + row]
+
                         if old_pixel == 1:
                             self.v[0xF] = 1
 
                         self.screen.pixels[x_coord + idx][y_coord + row] = 1 ^ old_pixel
+
             # print(f"opcode: {opcode} I: {self.i} size: 8x{n_rows} x: {x} y: {y}")
                 
             self.draw_flag = True
@@ -590,6 +595,7 @@ def main():
     # root = tkinter.Tk() 					# Creating a Tkinter window to use the file browser
     # emu.rom_path = askopenfilename() 	# Displaying the file browser and getting the selecting file
     # root.destroy() 					# Destroying Tkinter
+
     i = 512
     with open(emu.rom_path, "rb") as f:
         byte = f.read(1)
