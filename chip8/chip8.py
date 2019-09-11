@@ -426,7 +426,7 @@ class Chip8:
                 self.pc += 2
                 
         else:
-            print("unknown opcode")
+            print(f"unknown ident: {hex(ident)} opcode: {hex(opcode)}")
             self.shutdown()
 
     def shutdown(self):
