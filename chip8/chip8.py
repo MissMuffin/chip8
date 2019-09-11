@@ -490,6 +490,7 @@ class Chip8:
 
         if not self.rom_path:
             # TODO draw nice screen instead w/ option to load rom
+            print("No rom selected, exiting...")
             exit()
 
         # programs start at 0x200 in memory
