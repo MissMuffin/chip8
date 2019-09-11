@@ -391,8 +391,6 @@ class Chip8:
                 # A key press is awaited, and then stored in VX. (Blocking
                 # Operation. All instruction halted until next key event)
                 if 1 in self.keys:  
-                    # TODO according to https://retrocomputing.stackexchange.com/questions/358/how-are-held-down-keys-handled-in-chip-8
-                    # this is wrong behavior?
                     idx = self.keys.index(1)
                     x = (opcode & 0x0F00) >> 8
                     self.v[x] = idx & 0x00FF
