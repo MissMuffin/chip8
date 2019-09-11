@@ -118,7 +118,7 @@ class Chip8:
                 # return from subroutine
                 if self.sp > 0:
                     self.sp -= 1
-                    self.pc = self.stack[self.sp]
+                    self.pc = self.stack[self.sp] & 0x00FFFF
                     self.pc += 2
 
             else:
@@ -128,14 +128,15 @@ class Chip8:
         elif ident == 0x1000:
             # jump to address NNN
             addr = opcode & 0x0FFF
-            self.pc = addr
+            self.pc = addr & 0x00FFFF
 
         elif ident == 0x2000:
             # calls subroutine at address NNN
             self.stack[self.sp] = self.pc
-            self.sp += 1 # TODO handle overflow?
+            if self.sp < 0xF:
+                self.sp += 1 
             addr = opcode & 0x0FFF
-            self.pc = addr
+            self.pc = addr & 0x00FFFF
 
         elif ident == 0x3000:
             # skips next instr if V[X] == NN
@@ -165,14 +166,14 @@ class Chip8:
             # sets VX to NN
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
-            self.v[x] = nn
+            self.v[x] = nn & 0x00FF
             self.pc += 2
 
         elif ident == 0x7000:
             # adds NN to VX (carry flag not changed)
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
-            self.v[x] += nn
+            self.v[x] = (self.v[x] + nn)& 0x00FF
             self.pc += 2
 
         elif ident == 0x8000:
@@ -189,21 +190,21 @@ class Chip8:
                 # Sets VX to VX or VY. (Bitwise OR operation)
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
-                self.v[x] = self.v[x] | self.v[y]
+                self.v[x] = (self.v[x] | self.v[y]) & 0x00FF
                 self.pc += 2
 
             elif param == 0x0002:
                 # Sets VX to VX and VY. (Bitwise AND operation)
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
-                self.v[x] = self.v[x] & self.v[y]
+                self.v[x] = (self.v[x] & self.v[y]) & 0x00FF
                 self.pc += 2
 
             elif param == 0x0003:
                 # Sets VX to VX xor VY.
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
-                self.v[x] = self.v[x] ^ self.v[y]
+                self.v[x] = (self.v[x] ^ self.v[y]) & 0x00FF
                 self.pc += 2
 
             elif param == 0x0004:
@@ -213,11 +214,12 @@ class Chip8:
                 y = (opcode & 0x00F0) >> 4
                 vx = self.v[x]
                 vy = self.v[y]
-                if vy > (0xFF - vx):    # check for overflow > 255
+
+                self.v[0xF] = 0
+                if (vy + vx) > 0xFF:
                     self.v[0xF] = 1
-                else:
-                    self.v[0xF] = 0
-                self.v[x] = (vx + vy) % 0xFF
+
+                self.v[x] = (vx + vy) & 0x000FF
                 self.pc += 2
 
             elif param == 0x0005:
@@ -228,11 +230,11 @@ class Chip8:
                 vx = self.v[x]
                 vy = self.v[y]
 
+                self.v[0xF] = 1
                 if vy > vx:
                     self.v[0xF] = 0
-                else:
-                    self.v[0xF] = 1
-                self.v[x] = (vx - vy) % 0xFF # TODO is correct?
+                
+                self.v[x] = (vx - vy) & 0x000FF # TODO is correct?
                 self.pc += 2
 
             elif param == 0x0006:
@@ -241,7 +243,7 @@ class Chip8:
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.v[0xF] = Utils.get_LSB(vx)
-                self.v[x] = vx >> 1
+                self.v[x] = (vx >> 1) & 0x00FF
                 self.pc += 2
 
             elif param == 0x0007:
@@ -252,11 +254,11 @@ class Chip8:
                 vx = self.v[x]
                 vy = self.v[y]
                 
+                self.v[0xF] = 1
                 if vx > vy:
                     self.v[0xF] = 0
-                else:
-                    self.v[0xF] = 1
-                self.v[x] = (vx - vy) % 0xFF # TODO is correct?
+                
+                self.v[x] = (vy - vx) & 0x000FF # TODO is correct?
                 self.pc += 2
 
             elif param == 0x000E:
@@ -265,7 +267,7 @@ class Chip8:
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.v[0xF] = Utils.get_MSB(vx)
-                self.v[x] = vx << 1
+                self.v[x] = (vx << 1) & 0x00FF
                 self.pc += 2
 
         elif ident == 0x9000:
@@ -286,14 +288,14 @@ class Chip8:
             # jumps to adress NNN plus V0
             nnn = opcode & 0x0FFF
             v0 = self.v[0]
-            self.pc = nnn + v0
+            self.pc = (nnn + v0) & 0x000FFFF
 
         elif ident is 0xC000:
             # Sets VX to the result of a bitwise and operation on
             # a random number (Typically: 0 to 255) and NN
             x = opcode & 0x0F00 >> 8
             nn = opcode & 0x00FF
-            self.v[x] = randint(0, 255) & nn
+            self.v[x] = (randint(0, 255) & nn) & 0x00FF
             self.pc += 2
 
         elif ident is 0xD000:
@@ -358,10 +360,10 @@ class Chip8:
         elif ident == 0xF000:
             param = opcode & 0x000F
 
-            if param is 0x0007:
+            if param == 0x0007:
                 # Sets VX to the value of the delay timer.
-                x = opcode & 0x0F00 >> 8
-                self.v[x] = self.delay_timer
+                x = (opcode & 0x0F00) >> 8
+                self.v[x] = self.delay_timer & 0x00FF
                 self.pc += 2
 
             elif param == 0x000A:
@@ -395,8 +397,8 @@ class Chip8:
                     # I is set to I + X + 1 after operation
                     x = opcode & 0x0F00 >> 8
                     for idx in range(x + 1): # +1 for inclusive
-                        self.memory[self.i + idx] = self.v[idx]
-                    self.i = (self.i + x + 1) % 0xFFFF
+                        self.memory[self.i + idx] = self.v[idx] & 0x00FF
+                    self.i = (self.i + x + 1) & 0x000FFFF # TODO is this correct or not? cowgood vs mattmik
                     self.pc += 2
 
                 elif param == 0x0060:
@@ -406,8 +408,8 @@ class Chip8:
                     # I is set to I + X + 1 after operation
                     x = opcode & 0x0F00 >> 8
                     for idx in range(x + 1): # +1 for inclusive
-                        self.v[idx] = self.memory[self.i + idx]
-                    self.i = (self.i + x + 1) % 0xFFFF
+                        self.v[idx] = (self.memory[self.i + idx]) & 0x000FF
+                    self.i = (self.i + x + 1) & 0x000FFFF # TODO is this correct or not? cowgood vs mattmik
                     self.pc += 2
 
             elif param == 0x0008:
@@ -421,7 +423,7 @@ class Chip8:
                 # Adds VX to I
                 x = opcode & 0x0F00 >> 8
                 vx = self.v[x]
-                self.i = (self.i + vx) % 0xFFFF # TODO mod for overflow necessary?
+                self.i = (self.i + vx) & 0x00FFFF # TODO is modulo here correct or not? test rom only passes without modulo. why??
                 self.pc += 2
 
             elif param == 0x0009:
@@ -429,7 +431,7 @@ class Chip8:
                 # Characters 0-F (in hexadecimal) are represented by a 4x5 font.
                 x = opcode & 0x0F00 >> 8
                 vx = self.v[x]
-                self.i = vx * 5  # times 5 because each char is 5 long
+                self.i = (vx * 5) & 0x000FFFF  # times 5 because each char is 5 long
                 self.pc += 2
 
             elif param == 0x0003:
