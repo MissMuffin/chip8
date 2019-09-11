@@ -8,19 +8,17 @@ class Screen:
 
     def __init__(self):
 
-        # screen sizes
         self.x_size = 64
         self.y_size = 32
 
         self.upscaling = 10
         self.window = None
 
-        # sizes for window to be displayed
         self.window_size_x = 0
         self.window_size_y = 0
 
-        self.margin_x = 200
-        self.margin_y = 105
+        self.margin_x = 0
+        self.margin_y = 70
 
         # colors for pygame
         self.white = (255, 255, 255)
@@ -39,22 +37,14 @@ class Screen:
 
         pygame.display.set_caption("Chip8 Emulator")
 
-        self.window = pygame.display.set_mode(
-            (self.window_size_x, self.window_size_y), RESIZABLE)
+        self.window = pygame.display.set_mode((self.window_size_x, self.window_size_y), RESIZABLE)
 
-        pygame.draw.lines(
-            self.window,
-            self.white,
-            False,
-            [
-                (0, self.y_size*self.upscaling),
-                (self.x_size*self.upscaling, self.y_size*self.upscaling),
-                (self.x_size*self.upscaling, 0)
-            ]
-        )
-
-        self.memY = self.initCommands()
+        self.show_menu()
         self.refresh()
+
+    def clear(self):
+        # pixels[x][y]
+        self.pixels = [[0]*self.y_size for i in range(self.x_size)]
 
     def dump(self):
 
@@ -67,43 +57,41 @@ class Screen:
 
         return fname
 
+    def show_menu(self):
 
-    def clear(self):
-        # pixels[x][y]
-        self.pixels = [[0]*self.y_size for i in range(self.x_size)]
+        x = 20
+        y = self.y_size * self.upscaling + 20
 
-    def initCommands(self):
+        offset_x = x
+        offset_y = y
 
-        # Initial X is on the right of the game screen
-        initialX = self.x_size * self.upscaling + 10
-        x = initialX 									# Sets the X cursor to the initial X value
-        y = 10 											# Y cursor is on the top of the window
-
-        # We draw the commands text and move the Y cursor by the text's size
-        y += self.drawText("ESC: Quit", x, y)[1]
-        y += self.drawText("F1: Change ROM", x, y)[1]
-        y += self.drawText("F2: Reboot ROM", x, y)[1]
-        y += self.drawText("F3: Pause / Unpause", x, y)[1]
-        y += self.drawText("F4: Next step", x, y)[1]
-        y += self.drawText("F5: Sound ON / OFF", x, y)[1]
-
-        y += 10 																	# Move the cursor 10px downward
         pygame.draw.line(
             self.window,
             self.white,
-            (x, y),
-            (self.window_size_x - 10, y)) 	# To draw a separation line between commands and memory which is under
+            (0, self.y_size * self.upscaling),
+            (self.window_size_x, self.y_size * self.upscaling)
+        )
 
-        return y+10 	# Return the Y position 10px under our drawn line
+        offset_y += self.render_text("ESC: Quit", offset_x, offset_y)[1]
+        offset_x += self.render_text("F1: Change ROM", offset_x, offset_y)[0]
 
-    def drawText(self, text, X, Y):  # Draw a text at X and Y position, and returns the size it takes
+        offset_y = y
+        offset_x += 30
+        offset_y += self.render_text("F2: Reboot ROM", offset_x, offset_y)[1]
+        offset_x += self.render_text("F3: Pause / Unpause", offset_x, offset_y)[0]
 
-        # Renders the text and adds it to the window
-        self.window.blit(self.font.render(text, True, self.white), (X, Y))
-        return self.font.size(text) 										# Returns the text size
+        offset_y = y
+        offset_x += 30
+        offset_y += self.render_text("F4: Dump screen", offset_x, offset_y)[1]
+        offset_x += self.render_text("F5: Dump memory & registers", offset_x, offset_y)[0]
+
+
+    def render_text(self, text, x, y):
+
+        self.window.blit(self.font.render(text, True, self.white), (x, y))
+        return self.font.size(text)
 
     def refresh(self):
-
         for x in range(self.x_size):
             for y in range(self.y_size):
 
