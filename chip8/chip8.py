@@ -5,9 +5,6 @@ import pygame
 from pygame.locals import *
 from utils import Utils
 from random import randint
-import pdb
-import time
-
 
 class Chip8:
 
@@ -66,7 +63,6 @@ class Chip8:
             self.memory[i] = val
 
     def dump(self):
-
         fname = "dump_mem_reg.txt"
         op = (self.memory[self.pc] << 8) | self.memory[self.pc + 1]
         
