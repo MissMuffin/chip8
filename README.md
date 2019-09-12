@@ -10,7 +10,10 @@
 
 # Run
 
-`python chip8/chip8.python`
+```
+pipenv install
+python chip8/chip8.python
+```
 
 # Ressources used
 ## Legacy
