@@ -11,6 +11,7 @@ class Chip8:
     def __init__(self):
 
         self.rom_path = None
+        self.rom_path_none_selected = "no_rom_selected.ch8"
         self.running = False
         self.screen = Screen()
         self.beep = pygame.mixer.Sound("beep.ogg")
@@ -513,9 +514,7 @@ class Chip8:
             root.destroy()
 
         if not self.rom_path:
-            # TODO draw nice screen instead w/ option to load rom
-            print("No rom selected, exiting...")
-            exit()
+            self.rom_path = self.rom_path_none_selected
 
         # programs start at 0x200 in memory
         i = 0x200
@@ -642,7 +641,8 @@ def main():
     emu = Chip8()
 
     # emu.rom_path = "BC_test.ch8"
-    emu.rom_path = "roms/Space Invaders [David Winter].ch8"
+    # emu.rom_path = "roms/Space Invaders [David Winter].ch8"
+    # emu.rom_path = "roms/Chip8 Picture.ch8"
     # emu.rom_path = "roms/Brix [Andreas Gustafsson, 1990].ch8"
 
     emu.load_rom()

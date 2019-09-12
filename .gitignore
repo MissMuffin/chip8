@@ -2,6 +2,7 @@
 *.ch8
 *.txt
 *.csv
+!no_rom_selected.ch8
 
 .vscode/*
 # !.vscode/settings.json

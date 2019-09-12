@@ -35,4 +35,10 @@ Legacy: Set VF = LSB(VY), then set VX = VY / 2
 
 This project uses the 2005 implementation.
 
+## Grafics & Sound
+This project uses Pygame (https://www.pygame.org/news) 
+
 <sup>1</sup>https://www.reddit.com/r/EmuDev/comments/8cbvz6/chip8_8xy6/?utm_source=share&utm_medium=web2x
+
+## Octo IDE
+The Octo IDE (https://github.com/JohnEarnest/Octo) was used to create the placeholder rom that is shown when no rom has been selected from the file dialog. Thanks to John Earnest for creating this amazing tool.
