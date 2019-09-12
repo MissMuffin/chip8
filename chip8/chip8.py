@@ -440,7 +440,7 @@ class Chip8:
                     x = (opcode & 0x0F00) >> 8
                     for idx in range(x + 1): # +1 for inclusive
                         self.memory[self.i + idx] = self.v[idx] & 0x00FF
-                    self.i = (self.i + x + 1) & 0x000FFFF # TODO is this correct or not? cowgood vs mattmik
+                    # self.i = (self.i + x + 1) & 0x000FFFF # legacy
                     self.pc += 2
 
                 elif param == 0x0060:
@@ -451,7 +451,7 @@ class Chip8:
                     x = (opcode & 0x0F00) >> 8
                     for idx in range(x + 1): # +1 for inclusive
                         self.v[idx] = (self.memory[self.i + idx]) & 0x000FF
-                    self.i = (self.i + x + 1) & 0x000FFFF # TODO is this correct or not? cowgood vs mattmik
+                    # self.i = (self.i + x + 1) & 0x000FFFF # legacy
                     self.pc += 2
 
             elif param == 0x0008:
