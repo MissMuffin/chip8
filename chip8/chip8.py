@@ -26,7 +26,7 @@ class Chip8:
         self.stack = [0] * 16
 
         # program counter
-        # most programs start at 0x200
+        # most programs start at 0x200 (==512)
         # lower memory space is reserved for interpreter
         self.pc = 512
 
@@ -140,13 +140,14 @@ class Chip8:
         if ident == 0x0000:
             param = opcode & 0x000F
 
+            # 00E0
             if param == 0x0000:
                 # display clear
                 self.screen.clear()
-                # print("screen clear")
                 self.draw_flag = True
                 self.pc += 2
-
+            
+            # 00EE
             elif param == 0x000E:
                 # return from subroutine
                 if self.sp > 0:
@@ -158,11 +159,13 @@ class Chip8:
                 # opcode is 0NNN, not necessary for most roms
                 pass
 
+        # 1NNN
         elif ident == 0x1000:
             # jump to address NNN
             addr = opcode & 0x0FFF
             self.pc = addr & 0x00FFFF
 
+        # 2NNN
         elif ident == 0x2000:
             # calls subroutine at address NNN
             self.stack[self.sp] = self.pc
@@ -171,6 +174,7 @@ class Chip8:
             addr = opcode & 0x0FFF
             self.pc = addr & 0x00FFFF
 
+        # 3XNN
         elif ident == 0x3000:
             # skips next instr if V[X] == NN
             x = (opcode & 0x0F00) >> 8
@@ -179,6 +183,7 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
+        # 4XNN
         elif ident == 0x4000:
             # skips next instr if VX != NN
             x = (opcode & 0x0F00) >> 8
@@ -187,6 +192,7 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
+        # 5XY0
         elif ident == 0x5000:
             # skips next instr if VX == VY
             x = (opcode & 0x0F00) >> 8
@@ -195,6 +201,7 @@ class Chip8:
                 self.pc += 2
             self.pc += 2
 
+        # 6XNN
         elif ident == 0x6000:
             # sets VX to NN
             x = (opcode & 0x0F00) >> 8
@@ -202,6 +209,7 @@ class Chip8:
             self.v[x] = nn & 0x00FF
             self.pc += 2
 
+        # 7XNN
         elif ident == 0x7000:
             # adds NN to VX (carry flag not changed)
             x = (opcode & 0x0F00) >> 8
@@ -212,6 +220,7 @@ class Chip8:
         elif ident == 0x8000:
             param = opcode & 0x000F
 
+            # 8XY0
             if param == 0x0000:
                 # Sets VX to the value of VY
                 x = (opcode & 0x0F00) >> 8
@@ -219,30 +228,35 @@ class Chip8:
                 self.v[x] = self.v[y]
                 self.pc += 2
 
+            # 8XY1
             elif param == 0x0001:
-                # Sets VX to VX or VY. (Bitwise OR operation)
+                # set VX to VX or VY. (bitwise OR operation)
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = (self.v[x] | self.v[y]) & 0x00FF
                 self.pc += 2
 
+            # 8XY2
             elif param == 0x0002:
-                # Sets VX to VX and VY. (Bitwise AND operation)
+                # set VX to VX and VY. (bitwise AND operation)
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = (self.v[x] & self.v[y]) & 0x00FF
                 self.pc += 2
 
+            # 8XY3
             elif param == 0x0003:
-                # Sets VX to VX xor VY.
+                # set VX to VX xor VY.
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 self.v[x] = (self.v[x] ^ self.v[y]) & 0x00FF
                 self.pc += 2
 
+            # 8XY4
             elif param == 0x0004:
-                # Adds VY to VX. VF is set to 1 when there's a
-                # carry, and to 0 when there isn't.
+                # Adds VY to VX. VF is set to 1 when there is a
+                # carry (meaning result > 0xFF (==255)) 
+                # and to 0 when not
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 vx = self.v[x]
@@ -255,9 +269,11 @@ class Chip8:
                 self.v[x] = (vx + vy) & 0x000FF
                 self.pc += 2
 
+            # 8XY5
             elif param == 0x0005:
-                # VY is subtracted from VX. VF is set to 0 when
-                # there's a borrow, and 1 when there isn't
+                # VY is subtracted from VX
+                # VF is set to 0 when there is a borrow
+                # and 1 when not
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 vx = self.v[x]
@@ -270,18 +286,21 @@ class Chip8:
                 self.v[x] = (vx - vy) & 0x000FF # TODO is correct?
                 self.pc += 2
 
+            # 8XY6
             elif param == 0x0006:
-                # Stores the least significant bit of VX in VF
-                # and then shifts VX to the right by 1.
+                # store the least significant bit of VX in VF
+                # and then shift VX to the right by 1
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.v[0xF] = Utils.get_LSB(vx)
                 self.v[x] = (vx >> 1) & 0x00FF
                 self.pc += 2
 
+            # 8XY7
             elif param == 0x0007:
-                # Sets VX to VY minus VX. VF is set to 0 when
-                # there's a borrow, and 1 when there isn't.
+                # set VX to VY minus VX
+                # VF is set to 0 when there is a borrow
+                # and 1 when not
                 x = (opcode & 0x0F00) >> 8
                 y = (opcode & 0x00F0) >> 4
                 vx = self.v[x]
@@ -294,8 +313,9 @@ class Chip8:
                 self.v[x] = (vy - vx) & 0x000FF # TODO is correct?
                 self.pc += 2
 
+            # 8XYE
             elif param == 0x000E:
-                # Stores the most significant bit of VX in VF
+                # store the most significant bit of VX in VF
                 # and then shifts VX to the left by 1
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
@@ -303,29 +323,33 @@ class Chip8:
                 self.v[x] = (vx << 1) & 0x00FF
                 self.pc += 2
 
+        # 9XY0
         elif ident == 0x9000:
-            # skips next instr if VX != VY
+            # skip next instr if VX != VY
             x = (opcode & 0x0F00) >> 8
             y = (opcode & 0x00F0) >> 4
             if self.v[x] != self.v[y]:
                 self.pc += 2
             self.pc += 2
 
+        # ANNN
         elif ident == 0xA000:
-            # Sets I to the address NNN
+            # set I to the address NNN
             nnn = opcode & 0x0FFF
             self.i = nnn
             self.pc += 2
 
+        # BNNN
         elif ident == 0xB000:
-            # jumps to adress NNN plus V0
+            # jump to adress NNN plus V0
             nnn = opcode & 0x0FFF
             v0 = self.v[0]
             self.pc = (nnn + v0) & 0x000FFFF
 
+        # CXNN
         elif ident == 0xC000:
-            # Sets VX to the result of a bitwise and operation on
-            # a random number (Typically: 0 to 255) and NN
+            # set VX to a random number (0 to 255) 
+            # masked with NN
             x = (opcode & 0x0F00) >> 8
             nn = opcode & 0x00FF
             self.v[x] = (randint(0, 255) & nn) & 0x00FF
@@ -333,15 +357,10 @@ class Chip8:
 
         # DXYN
         elif ident == 0xD000:
-            # Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
-
-            # The interpreter reads n bytes from memory, starting at the address stored in I. 
-            # These bytes are then displayed as sprites on screen at coordinates (Vx, Vy). 
-            # Sprites are XORed onto the existing screen. If this causes any pixels to be erased, 
-            # VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it 
-            # is outside the coordinates of the display, it wraps around to the opposite side of 
-            # the screen. 
-
+            # draw sprite at position (VX, VY)
+            # using N bytes of sprite data at the address stored in I 
+            # sprites are XORed onto existing screen
+            # if any pre-existing pixels are erasid in that process, the collision flag VF is set
             x = (opcode & 0x0F00) >> 8
             y = (opcode & 0x00F0) >> 4
             n_rows = opcode & 0x000F
@@ -376,8 +395,6 @@ class Chip8:
                             self.v[0xF] = 1
 
                         self.screen.pixels[x_coord + idx][y_coord + row] = old_pixel ^ 1
-
-            # print(f"opcode: {opcode} I: {self.i} size: 8x{n_rows} x: {x} y: {y}")
                 
             self.draw_flag = True
             self.pc += 2
@@ -385,16 +402,18 @@ class Chip8:
         elif ident == 0xE000:
             param = opcode & 0x000F
 
+            # EX9E
             if param == 0x000E:
-                # Skips the next instruction if the key stored in VX is pressed
+                # skip the next instruction if the key stored in VX is pressed
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 if self.keys[vx]:
                     self.pc += 2
                 self.pc += 2
 
+            # EXA1
             elif param == 0x0001:
-                # Skips the next instruction if the key stored in VX isn't pressed
+                # skip the next instruction if the key stored in VX is not pressed
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 
@@ -405,15 +424,17 @@ class Chip8:
         elif ident == 0xF000:
             param = opcode & 0x000F
 
+            # FX07
             if param == 0x0007:
-                # Sets VX to the value of the delay timer.
+                # set VX to the value of the delay timer
                 x = (opcode & 0x0F00) >> 8
                 self.v[x] = self.delay_timer & 0x00FF
                 self.pc += 2
 
+            # FX0A
             elif param == 0x000A:
-                # A key press is awaited, and then stored in VX. (Blocking
-                # Operation. All instruction halted until next key event)
+                # wait for key press and then store key in VX
+                # this blocks until a key has been pressed
                 if 1 in self.keys:  
                     idx = self.keys.index(1)
                     x = (opcode & 0x0F00) >> 8
@@ -426,64 +447,64 @@ class Chip8:
             elif param == 0x0005:
                 param = opcode & 0x00F0
 
+                # FX15
                 if param == 0x0010:
-                    # sets the delay timer to VX
+                    # set the delay timer to VX
                     x = (opcode & 0x0F00) >> 8
                     vx = self.v[x]
                     self.delay_timer = vx
                     self.pc += 2
 
+                # FX55
                 elif param == 0x0050:
-                    # Stores V0 to VX (including VX) in memory starting at
-                    # address I. The offset from I is increased by 1 for each
-                    # value written
-                    # I is set to I + X + 1 after operation
+                    # store V0 to VX (including VX) in memory starting at
+                    # address I
+                    # [LEGACY] I is set to I + X + 1 after operation
                     x = (opcode & 0x0F00) >> 8
                     for idx in range(x + 1): # +1 for inclusive
                         self.memory[self.i + idx] = self.v[idx] & 0x00FF
                     # self.i = (self.i + x + 1) & 0x000FFFF # legacy
                     self.pc += 2
 
+                # FX65
                 elif param == 0x0060:
-                    # Fills V0 to VX (including VX) with values from memory
-                    # starting at address I. The offset from I is increased
-                    # by 1 for each value written
-                    # I is set to I + X + 1 after operation
+                    # fill V0 to VX (including VX) with values from memory
+                    # starting at address I
+                    # [LEGACY] I is set to I + X + 1 after operation
                     x = (opcode & 0x0F00) >> 8
                     for idx in range(x + 1): # +1 for inclusive
                         self.v[idx] = (self.memory[self.i + idx]) & 0x000FF
                     # self.i = (self.i + x + 1) & 0x000FFFF # legacy
                     self.pc += 2
 
+            # FX18
             elif param == 0x0008:
-                # Sets the sound timer to VX.
+                # set the sound timer to VX
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.sound_timer = vx
                 self.pc += 2
 
+            # FX1E
             elif param == 0x000E:
-                # Adds VX to I
+                # add VX to I
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.i = (self.i + vx) & 0x00FFFF # TODO is modulo here correct or not? test rom only passes without modulo. why??
                 self.pc += 2
 
+            # FX29
             elif param == 0x0009:
-                # Sets I to the location of the sprite for the character in VX.
-                # Characters 0-F (in hexadecimal) are represented by a 4x5 font.
+                # set I to the location of the sprite for the character in VX
+                # characters 0-F are represented by a 4x5 font
                 x = (opcode & 0x0F00) >> 8
                 vx = self.v[x]
                 self.i = (vx * 5) & 0x000FFFF  # times 5 because each char is 5 long
                 self.pc += 2
 
+            # FX33
             elif param == 0x0003:
-                # Stores the binary-coded decimal representation of VX, with the
-                # most significant of three digits at the address in I, the middle
-                # digit at I plus 1, and the least significant digit at I plus 2.
-                # (In other words, take the decimal representation of VX, place
-                # the hundreds digit in memory at location in I, the tens digit
-                # at location I+1, and the ones digit at location I+2.)
+                # Stores the binary-coded decimal representation of VX.)
                 x = (opcode & 0x0F00) >> 8
                 # vx is 3 digit decimal number
                 vx = self.v[x]
