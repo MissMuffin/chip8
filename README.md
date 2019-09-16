@@ -37,7 +37,9 @@ Legacy: Set VF = LSB(VY), then set VX = VY / 2
 This project uses the 2005 implementation.
 
 ### Grafics & Sound
-This project uses Pygame (https://www.pygame.org/news) 
+This project uses Pygame (https://www.pygame.org/news).
+
+Beep sound belongs to pan14 (https://freesound.org/people/pan14/sounds/263133/).
 
 ### Octo IDE
 The Octo IDE (https://github.com/JohnEarnest/Octo) was used to create the placeholder rom that is shown when no rom has been selected from the file dialog. Thanks to John Earnest for creating this amazing tool.
