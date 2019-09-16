@@ -8,7 +8,8 @@
 | 7 | 8 | 9 | E | → | a | s | d | f |
 | A | 0 | B | F | → | z | x | c | v |
 
-# Run
+# Install & Run
+Be sure to have pipenv and Tkinter installed.
 
 ```
 pipenv install
