@@ -1,5 +1,7 @@
 # Chip8 Interpreter (Emulator) in Python
 
+![Screenshot of the Interpreter](screenshot.png)
+
 ## Keyboard
 
 | 1 | 2 | 3 | C | → | 1 | 2 | 3 | 4 |
@@ -20,6 +22,7 @@ python chip8/chip8.python
 ### Legacy
 1. http://mattmik.com/files/chip8/mastering/chip8.html
 2. http://www.cs.columbia.edu/~sedwards/classes/2016/4840-spring/designs/Chip8.pdf
+3. Creating a Chip8 interpreter/emulator in C++14 by Bisqwit (https://www.youtube.com/watch?v=rpLoS7B6T94)
 
 ### New
 3. http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
