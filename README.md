@@ -9,7 +9,7 @@
 | A | 0 | B | F | → | z | x | c | v |
 
 ## Install & Run
-Be sure to have pipenv and Tkinter installed.
+Be sure to have Tkinter and pipenv (https://docs.pipenv.org/en/latest/install/#installing-pipenv) installed.
 
 ```
 pipenv install
@@ -21,20 +21,20 @@ python chip8/chip8.python
 1. http://mattmik.com/files/chip8/mastering/chip8.html
 2. http://www.cs.columbia.edu/~sedwards/classes/2016/4840-spring/designs/Chip8.pdf
 
-### 2005
+### New
 3. http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 4. http://devernay.free.fr/hacks/chip8/C8TECH10.HTM
 5. https://en.wikipedia.org/wiki/CHIP-8
 
-Note that the legacy resources reference the implementation from 1970. Most games written post 2005 use the new implemtation as described by Cowgod (4.)<sup>1</sup>.
+Note that the legacy resources reference the original CHIP-8 implementation from 1970. Most games written post 2005 use the new implemtation as described by Cowgod (4.)<sup>1</sup>.
 
-Example: 8XY6
+**Example: 8XY6**
 
-Legacy: Set VF = LSB(VY), then set VX = VY / 2
+*Legacy: Set VF = LSB(VY), then set VX = VY / 2*
 
-2005: Set VF = LSB(VX), then set VX = VX / 2
+*New: Set VF = LSB(VX), then set VX = VX / 2*
 
-This project uses the 2005 implementation.
+⚠️ This project implements the specification as seen in Cowgod's write-up(4). ⚠️
 
 ### Grafics & Sound
 This project uses Pygame (https://www.pygame.org/news).
