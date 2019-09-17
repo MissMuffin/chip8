@@ -1,4 +1,4 @@
-# Chip8 Emulator in Python
+# Chip8 Interpreter (Emulator) in Python
 
 ## Keyboard
 
