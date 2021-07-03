@@ -15,7 +15,7 @@ Be sure to have Tkinter and pipenv (https://docs.pipenv.org/en/latest/install/#i
 
 ```
 pipenv install
-python chip8/chip8.python
+python chip8/chip8.py
 ```
 
 ## Ressources used
